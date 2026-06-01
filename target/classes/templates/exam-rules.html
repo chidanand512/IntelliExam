@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Exam Rules | IntelliExam</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments :: head-assets}"></th:block>
+</head>
+<body>
+<div class="app-shell-app">
+    <aside th:replace="~{fragments :: sidenav('STUDENT', 'ongoing')}"></aside>
+    <div class="app-main">
+        <header th:replace="~{fragments :: topbar('Exam rules','Review carefully before you start.')}"></header>
+
+        <main class="app-content animate-fade-up">
+            <section class="content-panel animate-pop">
+                <span class="badge-soft warning"><i class="bi bi-exclamation-triangle"></i> Before you start</span>
+                <h1 class="display-6 fw-bold mt-3" th:text="${exam.title}">Exam title</h1>
+                <p class="muted-copy" th:text="${exam.description}">Description</p>
+
+                <div class="stat-grid mt-4">
+                    <div class="stat-card"><strong th:text="${exam.durationMinutes}">0</strong><span>Minutes</span><div class="stat-ico"><i class="bi bi-stopwatch"></i></div></div>
+                    <div class="stat-card"><strong th:text="${exam.examDate}">Date</strong><span>Exam date</span><div class="stat-ico"><i class="bi bi-calendar"></i></div></div>
+                    <div class="stat-card"><strong th:text="${exam.examTime}">Time</strong><span>Start time</span><div class="stat-ico"><i class="bi bi-clock"></i></div></div>
+                    <div class="stat-card"><strong>3</strong><span>Tab warnings</span><div class="stat-ico"><i class="bi bi-exclamation-octagon"></i></div></div>
+                </div>
+
+                <div class="row g-4 mt-1">
+                    <div class="col-lg-7">
+                        <h2 class="h5 fw-bold"><i class="bi bi-list-check"></i> Exam rules</h2>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item px-0"><i class="bi bi-arrows-fullscreen text-primary"></i> The exam requests full-screen mode when it starts.</li>
+                            <li class="list-group-item px-0"><i class="bi bi-fullscreen-exit text-danger"></i> Pressing Esc or exiting full-screen is counted as a tab-switch violation.</li>
+                            <li class="list-group-item px-0"><i class="bi bi-eye text-warning"></i> Tab switching is monitored. The third violation auto-submits the exam.</li>
+                            <li class="list-group-item px-0"><i class="bi bi-wifi text-success"></i> Keep your internet connection stable until submission.</li>
+                            <li class="list-group-item px-0"><i class="bi bi-stopwatch text-danger"></i> Submit before the timer ends. The form submits automatically at time over.</li>
+                            <li class="list-group-item px-0"><i class="bi bi-key text-info"></i> Use the exam password shared by your examiner.</li>
+                            <li class="list-group-item px-0" th:if="${exam.negativeMarking}">
+                                <i class="bi bi-dash-circle text-danger"></i>
+                                Negative marking is enabled:
+                                <strong th:text="${exam.negativeMarksPerWrong}">1</strong>
+                                mark(s) deducted for every wrong answer.
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-5">
+                        <div class="p-4 rounded-3 border" style="background: var(--panel-soft)">
+                            <h2 class="h5 fw-bold"><i class="bi bi-shield-lock"></i> Enter exam password</h2>
+                            <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+                            <form method="post" th:action="@{'/student/exam/' + ${exam.id} + '/start'}">
+                                <input class="form-control mb-3" name="examPassword" type="password" placeholder="Exam password" required>
+                                <button class="btn-brand w-100" type="submit"><i class="bi bi-play-circle"></i> Start exam</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

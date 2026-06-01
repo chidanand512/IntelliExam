@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Contact IntelliExam</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments :: head-assets}"></th:block>
+</head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments :: navbar}"></div>
+    <main class="page-section">
+        <div class="container">
+            <div class="row g-4 align-items-stretch">
+                <div class="col-lg-6">
+                    <div class="content-panel h-100 animate-fade-up">
+                        <span class="badge-soft"><i class="bi bi-chat-dots"></i> Get in touch</span>
+                        <h1 class="display-6 fw-bold mt-3">Talk to IntelliExam support.</h1>
+                        <p class="muted-copy">For setup help, college deployment, exam scheduling, student support, or report access, contact the IntelliExam team.</p>
+                        <div class="list-group list-group-flush mt-4">
+                            <div class="list-group-item px-0"><i class="bi bi-envelope"></i> <strong>Email:</strong> support@intelliexam.local</div>
+                            <div class="list-group-item px-0"><i class="bi bi-telephone"></i> <strong>Phone:</strong> +91 98765 43210</div>
+                            <div class="list-group-item px-0"><i class="bi bi-clock"></i> <strong>Hours:</strong> Monday to Saturday, 9:00 AM - 6:00 PM</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="content-panel h-100 animate-fade-up delay-1">
+                        <span class="badge-soft"><i class="bi bi-geo-alt"></i> Address</span>
+                        <h2 class="h4 fw-bold mt-3">IntelliExam Learning Labs</h2>
+                        <p class="muted-copy mb-4">2nd Floor, Knowledge Park, Bengaluru, Karnataka 560001, India</p>
+                        <div class="p-4 rounded-3 border" style="background: var(--panel-soft)">
+                            <h3 class="h5 fw-bold"><i class="bi bi-rocket"></i> Deployment services</h3>
+                            <p class="muted-copy mb-0">Institute onboarding, examiner training, assessment migration, question bank setup, and reporting workflow support.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div th:replace="~{fragments :: footer}"></div>
+</div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

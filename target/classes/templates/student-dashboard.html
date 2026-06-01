@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard | IntelliExam</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments :: head-assets}"></th:block>
+</head>
+<body>
+<div class="app-shell-app">
+    <aside th:replace="~{fragments :: sidenav('STUDENT', 'dashboard')}"></aside>
+    <div class="app-main">
+        <header th:replace="~{fragments :: topbar('Student Dashboard','Pick up where you left off.')}"></header>
+
+        <main class="app-content animate-fade-up">
+            <section class="greeting-banner">
+                <div>
+                    <span class="badge-soft" style="background: rgba(255,255,255,.18); color: #fff;"><i class="bi bi-stars"></i> Welcome back</span>
+                    <h2 class="mt-2">Hello, <span th:text="${user.fullName}">Student</span> <span style="font-weight:400">👋</span></h2>
+                    <p>Your learning hub. Jump into an ongoing test, plan upcoming ones, or review your published results.</p>
+                </div>
+                <div class="quick-actions">
+                    <a class="btn-line" th:href="@{/student/ongoing}"><i class="bi bi-play-circle"></i> Ongoing</a>
+                    <a class="btn-line" th:href="@{/student/upcoming}"><i class="bi bi-calendar-event"></i> Upcoming</a>
+                    <a class="btn-brand" th:href="@{/student/results}"><i class="bi bi-bar-chart"></i> Results</a>
+                </div>
+            </section>
+
+            <div class="stat-grid">
+                <div class="stat-card animate-pop">
+                    <strong th:text="${ongoingCount}">0</strong>
+                    <span>Ongoing tests</span>
+                    <div class="stat-ico"><i class="bi bi-play-circle"></i></div>
+                </div>
+                <div class="stat-card animate-pop delay-1">
+                    <strong th:text="${upcomingCount}">0</strong>
+                    <span>Upcoming tests</span>
+                    <div class="stat-ico"><i class="bi bi-calendar-event"></i></div>
+                </div>
+                <div class="stat-card animate-pop delay-2">
+                    <strong th:text="${#lists.size(attempts)}">0</strong>
+                    <span>Attempts</span>
+                    <div class="stat-ico"><i class="bi bi-pencil-square"></i></div>
+                </div>
+                <div class="stat-card animate-pop delay-3">
+                    <strong th:text="${resultsAvailable}">0</strong>
+                    <span>Results published</span>
+                    <div class="stat-ico"><i class="bi bi-bar-chart-line"></i></div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-7">
+                    <section class="content-panel animate-fade-up">
+                        <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+                            <div>
+                                <h2 class="h5 fw-bold mb-1"><i class="bi bi-collection-play"></i> Recent published exams</h2>
+                                <p class="muted-copy mb-0">View rules and join with the examiner-shared password.</p>
+                            </div>
+                            <a class="btn-line" th:href="@{/student/ongoing}"><i class="bi bi-arrow-right"></i></a>
+                        </div>
+                        <div class="exam-card-grid">
+                            <article class="exam-card" th:each="e, st : ${exams}" th:if="${st.index < 4}">
+                                <span class="badge-soft info"><i class="bi bi-shield-check"></i> Password protected</span>
+                                <h3 th:text="${e.title}">Exam</h3>
+                                <div class="exam-card-meta">
+                                    <span><i class="bi bi-calendar"></i> <span th:text="${e.examDate}">date</span></span>
+                                    <span><i class="bi bi-clock"></i> <span th:text="${e.examTime}">time</span></span>
+                                    <span><i class="bi bi-stopwatch"></i> <span th:text="${e.durationMinutes} + ' min'">duration</span></span>
+                                </div>
+                                <a class="btn-brand" th:href="@{'/student/exam/' + ${e.id} + '/rules'}"><i class="bi bi-box-arrow-in-right"></i> View rules</a>
+                            </article>
+                            <div th:if="${#lists.isEmpty(exams)}" class="exam-card text-center">
+                                <i class="bi bi-emoji-frown" style="font-size:2rem;color:var(--muted)"></i>
+                                <p class="muted-copy mb-0">No published exams right now.</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="col-lg-5">
+                    <section class="content-panel animate-fade-up delay-2">
+                        <h2 class="h5 fw-bold mb-3"><i class="bi bi-clock-history"></i> Recent attempts</h2>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                <tr><th>Exam</th><th>Score</th><th></th></tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="a, st : ${attempts}" th:if="${st.index < 5}">
+                                    <td>
+                                        <strong th:text="${a.exam.title}">Exam</strong>
+                                        <div class="muted-copy small">
+                                            <span th:if="${a.exam.resultsPublished}" class="badge-soft success"><i class="bi bi-check-circle"></i> Result available</span>
+                                            <span th:if="${!a.exam.resultsPublished}" class="badge-soft warning"><i class="bi bi-hourglass-split"></i> Awaiting publish</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <strong th:if="${a.exam.resultsPublished}" th:text="${a.score} + '/' + ${a.totalQuestions}">0/0</strong>
+                                        <span th:if="${!a.exam.resultsPublished}" class="muted-copy">--</span>
+                                    </td>
+                                    <td>
+                                        <a class="btn-line btn-sm" th:href="@{'/student/result/' + ${a.id}}"><i class="bi bi-eye"></i></a>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(attempts)}">
+                                    <td colspan="3" class="text-center muted-copy py-4">Your attempts will appear here.</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

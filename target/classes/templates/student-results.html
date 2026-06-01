@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My Results | IntelliExam</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments :: head-assets}"></th:block>
+</head>
+<body>
+<div class="app-shell-app">
+    <aside th:replace="~{fragments :: sidenav('STUDENT', 'results')}"></aside>
+    <div class="app-main">
+        <header th:replace="~{fragments :: topbar('My results','Visual analysis of every exam you took.')}"></header>
+
+        <main class="app-content animate-fade-up">
+            <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-3">
+                <div>
+                    <span class="badge-soft"><i class="bi bi-bar-chart"></i> Results</span>
+                    <h2 class="h3 fw-bold mt-2">Your performance</h2>
+                    <p class="muted-copy mb-0">Results show only after the examiner publishes them.</p>
+                </div>
+            </div>
+
+            <div class="exam-card-grid">
+                <article class="exam-card animate-fade-up" th:each="a, st : ${attempts}" th:style="'animation-delay:' + ${st.index * 0.05} + 's'">
+                    <div class="d-flex justify-content-between align-items-start gap-2">
+                        <span class="badge-soft success" th:if="${a.exam.resultsPublished}"><i class="bi bi-check-circle"></i> Published</span>
+                        <span class="badge-soft warning" th:if="${!a.exam.resultsPublished}"><i class="bi bi-hourglass-split"></i> Pending</span>
+                        <span class="badge-soft info"><i class="bi bi-calendar"></i> <span th:text="${a.exam.examDate}">date</span></span>
+                    </div>
+                    <h3 th:text="${a.exam.title}">Exam</h3>
+
+                    <div th:if="${a.exam.resultsPublished}">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong style="font-size:1.8rem" th:text="${a.score} + '/' + ${a.totalQuestions}">0/0</strong>
+                                <div class="muted-copy small">Score</div>
+                            </div>
+                            <div th:with="pct=${a.totalQuestions != null and a.totalQuestions > 0 ? (a.score * 100 / a.totalQuestions) : 0}">
+                                <span class="badge-soft" th:classappend="${pct >= 60 ? ' success' : (pct >= 40 ? ' warning' : ' danger')}" th:text="${pct} + '%'">0%</span>
+                            </div>
+                        </div>
+                        <a class="btn-brand mt-2" th:href="@{'/student/result/' + ${a.id}}"><i class="bi bi-graph-up"></i> View analysis</a>
+                    </div>
+                    <div th:if="${!a.exam.resultsPublished}">
+                        <p class="muted-copy mb-2">Your result will appear once the examiner publishes it.</p>
+                        <button class="btn-line w-100" disabled><i class="bi bi-lock"></i> Locked</button>
+                    </div>
+                </article>
+
+                <div class="exam-card text-center" th:if="${#lists.isEmpty(attempts)}">
+                    <i class="bi bi-clipboard-data" style="font-size:2.4rem;color:var(--muted)"></i>
+                    <h3 class="h5 mt-2">No results yet</h3>
+                    <p class="muted-copy mb-0">Take an exam to see results here.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

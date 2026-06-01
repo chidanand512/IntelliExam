@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Result Analysis | IntelliExam</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments :: head-assets}"></th:block>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app-shell-app">
+    <aside th:replace="~{fragments :: sidenav(${user.role.name()}, ${activePage})}"></aside>
+    <div class="app-main">
+        <header th:replace="~{fragments :: topbar('Result analysis','Per-question breakdown and visuals.')}"></header>
+
+        <main class="app-content animate-fade-up">
+            <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-3">
+                <div>
+                    <span class="badge-soft info"><i class="bi bi-graph-up"></i> Detailed report</span>
+                    <h2 class="h3 fw-bold mt-2" th:text="${attempt.exam.title}">Exam</h2>
+                    <p class="muted-copy mb-0">
+                        <i class="bi bi-person"></i> <span th:text="${attempt.student.fullName}">Student</span>
+                        &nbsp;·&nbsp;
+                        <i class="bi bi-envelope"></i> <span th:text="${attempt.student.email}">email</span>
+                    </p>
+                </div>
+                <a class="btn-line" th:href="${user.role.name() == 'EXAMINER'} ? @{'/examiner/exam/' + ${attempt.exam.id} + '/analytics'} : @{/student/results}">
+                    <i class="bi bi-arrow-left"></i> Back
+                </a>
+            </div>
+
+            <div class="row g-3 mb-3 align-items-stretch result-overview-compact">
+                <div class="col-lg-5">
+                    <section class="content-panel text-center animate-pop">
+                        <h2 class="h6 muted-copy">Overall score</h2>
+                        <div class="score-ring" th:style="'--pct:' + ${totalCount > 0 ? (correctCount * 100 / totalCount) : 0}">
+                            <div class="score-ring-inner">
+                                <strong th:text="${correctCount} + '/' + ${totalCount}">0/0</strong>
+                                <span th:text="${totalCount > 0 ? (correctCount * 100 / totalCount) : 0} + '%'">0%</span>
+                            </div>
+                        </div>
+                        <div class="mt-3 d-flex justify-content-center gap-2 flex-wrap">
+                            <span class="badge-soft success"><i class="bi bi-check-circle"></i> <span th:text="${correctCount}">0</span> correct</span>
+                            <span class="badge-soft danger"><i class="bi bi-x-circle"></i> <span th:text="${wrongCount}">0</span> wrong</span>
+                        </div>
+                    </section>
+                </div>
+                <div class="col-lg-7">
+                    <section class="content-panel animate-pop delay-1">
+                        <h2 class="h6 muted-copy">Performance overview</h2>
+                        <canvas id="resultChart" height="96"></canvas>
+                    </section>
+                </div>
+            </div>
+
+            <section class="content-panel animate-fade-up">
+                <h2 class="h5 fw-bold mb-3"><i class="bi bi-list-check"></i> Question-by-question</h2>
+                <div th:each="ans, st : ${answers}"
+                     th:class="${ans.correct ? 'answer-row correct' : 'answer-row wrong'}"
+                     th:style="'animation-delay:' + ${st.index * 0.04} + 's'">
+                    <div class="d-flex justify-content-between gap-3">
+                        <strong><span th:text="${st.count} + '. '">1.</span><span th:text="${ans.question.questionText}">Q</span></strong>
+                        <span th:if="${ans.correct}" class="badge-soft success"><i class="bi bi-check-lg"></i> Correct</span>
+                        <span th:if="${!ans.correct}" class="badge-soft danger"><i class="bi bi-x-lg"></i> Wrong</span>
+                    </div>
+                    <div class="opts">
+                        <span class="opt"
+                              th:classappend="${ans.selectedOption == 'A'} ? ' your' : (${ans.question.correctOption == 'A'} ? ' correct-opt' : '')">
+                            A. <span th:text="${ans.question.optionA}">A</span>
+                        </span>
+                        <span class="opt"
+                              th:classappend="${ans.selectedOption == 'B'} ? ' your' : (${ans.question.correctOption == 'B'} ? ' correct-opt' : '')">
+                            B. <span th:text="${ans.question.optionB}">B</span>
+                        </span>
+                        <span class="opt"
+                              th:classappend="${ans.selectedOption == 'C'} ? ' your' : (${ans.question.correctOption == 'C'} ? ' correct-opt' : '')">
+                            C. <span th:text="${ans.question.optionC}">C</span>
+                        </span>
+                        <span class="opt"
+                              th:classappend="${ans.selectedOption == 'D'} ? ' your' : (${ans.question.correctOption == 'D'} ? ' correct-opt' : '')">
+                            D. <span th:text="${ans.question.optionD}">D</span>
+                        </span>
+                    </div>
+                    <p class="muted-copy small mt-2 mb-0">
+                        Your answer: <strong th:text="${ans.selectedOption ?: '—'}">—</strong>
+                        &nbsp;·&nbsp;
+                        Correct: <strong th:text="${ans.question.correctOption}">—</strong>
+                    </p>
+                </div>
+                <p class="muted-copy mb-0" th:if="${#lists.isEmpty(answers)}">No answer detail recorded.</p>
+            </section>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/app.js}"></script>
+<script th:inline="javascript">
+    const correct = /*[[${correctCount}]]*/ 0;
+    const wrong = /*[[${wrongCount}]]*/ 0;
+    const ctx = document.getElementById('resultChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Correct', 'Wrong'],
+                datasets: [{
+                    data: [correct, wrong],
+                    backgroundColor: ['#16a34a', '#dc2626'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                },
+                cutout: '62%'
+            }
+        });
+    }
+</script>
+</body>
+</html>

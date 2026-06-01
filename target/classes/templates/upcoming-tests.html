@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Upcoming Tests | IntelliExam</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments :: head-assets}"></th:block>
+</head>
+<body>
+<div class="app-shell-app">
+    <aside th:replace="~{fragments :: sidenav('STUDENT', 'upcoming')}"></aside>
+    <div class="app-main">
+        <header th:replace="~{fragments :: topbar('Upcoming tests','Plan ahead for what is coming.')}"></header>
+
+        <main class="app-content animate-fade-up">
+            <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-3">
+                <div>
+                    <span class="badge-soft info"><i class="bi bi-calendar-event"></i> Scheduled</span>
+                    <h2 class="h3 fw-bold mt-2">Coming up</h2>
+                    <p class="muted-copy mb-0">Stay prepared - exams scheduled for later dates.</p>
+                </div>
+                <span class="badge-soft" th:text="${#lists.size(exams)} + ' scheduled'">0 scheduled</span>
+            </div>
+
+            <div class="exam-card-grid">
+                <article class="exam-card animate-fade-up" th:each="e, st : ${exams}" th:style="'animation-delay:' + ${st.index * 0.05} + 's'">
+                    <div class="d-flex justify-content-between align-items-start gap-2">
+                        <span class="badge-soft info"><i class="bi bi-calendar-event"></i> Upcoming</span>
+                        <span class="badge-soft warning"><i class="bi bi-bell"></i> Not started</span>
+                    </div>
+                    <h3 th:text="${e.title}">Exam</h3>
+                    <p class="muted-copy small mb-0" th:text="${e.description}">Description</p>
+                    <div class="exam-card-meta">
+                        <span><i class="bi bi-calendar"></i> <span th:text="${e.examDate}">date</span></span>
+                        <span><i class="bi bi-clock"></i> <span th:text="${e.examTime}">time</span></span>
+                        <span><i class="bi bi-stopwatch"></i> <span th:text="${e.durationMinutes} + ' min'">duration</span></span>
+                        <span><i class="bi bi-question-circle"></i> <span th:text="${e.totalQuestions} + ' Qs'">Qs</span></span>
+                    </div>
+                    <button class="btn-line" disabled><i class="bi bi-lock"></i> Opens on exam day</button>
+                </article>
+
+                <div class="exam-card text-center" th:if="${#lists.isEmpty(exams)}">
+                    <i class="bi bi-emoji-smile" style="font-size:2.4rem;color:var(--muted)"></i>
+                    <h3 class="h5 mt-2">Nothing scheduled</h3>
+                    <p class="muted-copy mb-0">You're all caught up.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Examiner Dashboard | IntelliExam</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments :: head-assets}"></th:block>
+</head>
+<body>
+<div class="app-shell-app">
+    <aside th:replace="~{fragments :: sidenav('EXAMINER', 'dashboard')}"></aside>
+    <div class="app-main">
+        <header th:replace="~{fragments :: topbar('Examiner dashboard','Create, manage, and analyze your exams.')}"></header>
+
+        <main class="app-content animate-fade-up">
+            <section class="greeting-banner">
+                <div>
+                    <span class="badge-soft" style="background: rgba(255,255,255,.18); color: #fff;"><i class="bi bi-stars"></i> Examiner control center</span>
+                    <h2 class="mt-2">Hello, <span th:text="${user.fullName}">Examiner</span></h2>
+                    <p>Build assessments, control access with exam passwords, monitor attempts, and publish results when ready.</p>
+                </div>
+                <div class="quick-actions">
+                    <a class="btn-brand" th:href="@{/examiner/exam/new}"><i class="bi bi-plus-square"></i> Create exam</a>
+                </div>
+            </section>
+
+            <div class="stat-grid">
+                <div class="stat-card animate-pop"><strong th:text="${#lists.size(exams)}">0</strong><span>Total exams</span><div class="stat-ico"><i class="bi bi-collection"></i></div></div>
+                <div class="stat-card animate-pop delay-1">
+                    <strong th:text="${publishedCount}">0</strong>
+                    <span>Published</span>
+                    <div class="stat-ico"><i class="bi bi-broadcast"></i></div>
+                </div>
+                <div class="stat-card animate-pop delay-2">
+                    <strong th:text="${draftCount}">0</strong>
+                    <span>Drafts</span>
+                    <div class="stat-ico"><i class="bi bi-file-earmark"></i></div>
+                </div>
+                <div class="stat-card animate-pop delay-3">
+                    <strong>XLSX</strong>
+                    <span>Excel export</span>
+                    <div class="stat-ico"><i class="bi bi-file-earmark-excel"></i></div>
+                </div>
+            </div>
+
+            <section class="content-panel animate-fade-up">
+                <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+                    <div>
+                        <h2 class="h5 fw-bold mb-1"><i class="bi bi-clipboard-data"></i> Your exams</h2>
+                        <p class="muted-copy mb-0">Manage questions, publish, and view analytics with one click.</p>
+                    </div>
+                    <a class="btn-brand" th:href="@{/examiner/exam/new}"><i class="bi bi-plus-lg"></i> New exam</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                        <tr><th>Title</th><th>Date</th><th>Status</th><th>Access</th><th>Result</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="e : ${exams}">
+                            <td>
+                                <strong th:text="${e.title}">Exam title</strong>
+                                <div class="muted-copy small">
+                                    <i class="bi bi-stopwatch"></i> <span th:text="${e.durationMinutes} + ' min'">duration</span>
+                                    &nbsp;·&nbsp;
+                                    <i class="bi bi-question-circle"></i> <span th:text="${e.totalQuestions} + ' Qs limit'">Limit</span>
+                                </div>
+                            </td>
+                            <td th:text="${e.examDate}">Date</td>
+                            <td>
+                                <span class="badge-soft" th:classappend="${e.published ? ' success' : ' warning'}"
+                                      th:text="${e.published ? 'Published' : 'Draft'}">Draft</span>
+                            </td>
+                            <td>
+                                <span class="badge-soft info" th:text="${e.publicExam ? 'Public' : 'Private'}">Access</span>
+                                <a class="badge-soft mt-1 d-inline-block" th:if="${e.publicExam and e.publicToken != null}" th:href="@{'/public/exam/' + ${e.publicToken}}">
+                                    <i class="bi bi-link-45deg"></i> Link
+                                </a>
+                            </td>
+                            <td>
+                                <span class="badge-soft" th:classappend="${e.resultsPublished ? ' success' : ' info'}"
+                                      th:text="${e.resultsPublished ? 'Visible' : 'Hidden'}">Hidden</span>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <a class="btn-line" th:href="@{'/examiner/exam/' + ${e.id} + '/questions'}" title="Manage questions"><i class="bi bi-pencil-square"></i></a>
+                                    <a class="btn-line" th:href="@{'/examiner/exam/' + ${e.id} + '/analytics'}" title="Analytics"><i class="bi bi-graph-up"></i></a>
+                                    <a class="btn-line" th:href="@{'/examiner/exam/' + ${e.id} + '/report.xlsx'}" title="Download Excel"><i class="bi bi-file-earmark-excel"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(exams)}">
+                            <td colspan="6" class="text-center muted-copy py-4">Create your first exam to begin.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Questions | IntelliExam</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments :: head-assets}"></th:block>
+</head>
+<body>
+<div class="app-shell-app">
+    <aside th:replace="~{fragments :: sidenav('EXAMINER', 'dashboard')}"></aside>
+    <div class="app-main">
+        <header th:replace="~{fragments :: topbar('Manage questions','Add MCQs up to the exam limit.')}"></header>
+
+        <main class="app-content animate-fade-up">
+            <section class="greeting-banner">
+                <div>
+                    <span class="badge-soft" style="background: rgba(255,255,255,.18); color: #fff;"
+                          th:text="${exam.published ? 'Published' : 'Draft'}">Draft</span>
+                    <span class="badge-soft" style="background: rgba(255,255,255,.18); color: #fff;"
+                          th:text="${exam.publicExam ? 'Public exam' : 'Private exam'}">Access</span>
+                    <h2 class="mt-2" th:text="${exam.title}">Exam title</h2>
+                    <p th:text="${exam.description}">Description</p>
+                    <p class="mb-0" th:if="${exam.publicExam and exam.publicToken != null}">
+                        Share link:
+                        <a class="text-white fw-bold" th:href="@{'/public/exam/' + ${exam.publicToken}}" th:text="@{'/public/exam/' + ${exam.publicToken}}">public link</a>
+                    </p>
+                </div>
+                <div class="quick-actions">
+                    <a class="btn-line" th:href="@{/examiner/dashboard}"><i class="bi bi-arrow-left"></i> Dashboard</a>
+                    <a class="btn-brand" th:href="@{'/examiner/exam/' + ${exam.id} + '/analytics'}"><i class="bi bi-graph-up"></i> Analytics</a>
+                </div>
+            </section>
+
+            <div class="stat-grid">
+                <div class="stat-card animate-pop">
+                    <strong><span th:text="${#lists.size(questions)}">0</span>/<span th:text="${exam.totalQuestions}">0</span></strong>
+                    <span>Questions added</span>
+                    <div class="stat-ico"><i class="bi bi-list-ol"></i></div>
+                </div>
+                <div class="stat-card animate-pop delay-1"><strong th:text="${#lists.size(attempts)}">0</strong><span>Attempts</span><div class="stat-ico"><i class="bi bi-people"></i></div></div>
+                <div class="stat-card animate-pop delay-2"><strong th:text="${exam.durationMinutes}">0</strong><span>Minutes</span><div class="stat-ico"><i class="bi bi-stopwatch"></i></div></div>
+                <div class="stat-card animate-pop delay-3"><strong>4</strong><span>Options per Q</span><div class="stat-ico"><i class="bi bi-ui-radios"></i></div></div>
+            </div>
+
+            <div class="alert alert-danger" th:if="${error}">
+                <i class="bi bi-exclamation-octagon"></i> <span th:text="${error}">error</span>
+            </div>
+            <div class="alert alert-success" th:if="${success}">
+                <i class="bi bi-check-circle"></i> <span th:text="${success}">success</span>
+            </div>
+
+            <div class="publish-share-modal" th:if="${publishedExam}"
+                 th:data-title="${publishedTitle}"
+                 th:data-link="${publishedLink}"
+                 th:data-password="${publishedPassword}">
+                <div class="publish-share-card animate-pop">
+                    <button class="btn-line publish-close" type="button" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+                    <div class="share-hero">
+                        <span class="share-hero-icon"><i class="bi bi-broadcast"></i></span>
+                        <div>
+                            <span class="badge-soft success">Exam published</span>
+                            <h2 class="h4 fw-bold mt-2 mb-1" th:text="${publishedTitle}">Exam title</h2>
+                            <p class="muted-copy mb-0">Share the access link and password with eligible students.</p>
+                        </div>
+                    </div>
+
+                    <div class="share-card-grid">
+                        <div class="share-detail">
+                            <span><i class="bi bi-link-45deg"></i> Exam link</span>
+                            <div>
+                                <input id="publishedExamLink" class="form-control" th:value="${publishedLink}" readonly>
+                                <button class="btn-brand" type="button" data-copy-target="publishedExamLink"><i class="bi bi-copy"></i> Copy</button>
+                            </div>
+                        </div>
+                        <div class="share-detail">
+                            <span><i class="bi bi-key"></i> Password</span>
+                            <div>
+                                <input id="publishedExamPassword" class="form-control" th:value="${publishedPassword}" readonly>
+                                <button class="btn-brand" type="button" data-copy-target="publishedExamPassword"><i class="bi bi-copy"></i> Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ul class="share-instructions">
+                        <li><i class="bi bi-check-circle"></i> Ask students to keep ID details ready before starting.</li>
+                        <li><i class="bi bi-arrows-fullscreen"></i> Exam opens in full-screen mode and Esc counts as a violation.</li>
+                        <li><i class="bi bi-shield-exclamation"></i> Each student can attempt this exam only once.</li>
+                    </ul>
+                    <p class="share-label">Quick share</p>
+                    <div class="share-actions">
+                        <a id="shareWhatsapp" class="share-icon whatsapp" href="#" target="_blank" rel="noopener" title="Share on WhatsApp">
+                            <i class="bi bi-whatsapp"></i>
+                        </a>
+                        <a class="share-icon telegram" th:href="'https://t.me/share/url?url=' + ${publishedLink} + '&text=' + ${publishedTitle}" target="_blank" rel="noopener" title="Share on Telegram">
+                            <i class="bi bi-telegram"></i>
+                        </a>
+                        <a class="share-icon mail" th:href="'mailto:?subject=' + ${publishedTitle} + '&body=Exam link: ' + ${publishedLink} + '%0APassword: ' + ${publishedPassword}" title="Share by email">
+                            <i class="bi bi-envelope-fill"></i>
+                        </a>
+                        <button class="share-icon copy" type="button" data-copy-target="publishedExamLink" title="Copy link">
+                            <i class="bi bi-copy"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-5">
+                    <section class="content-panel animate-pop">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h2 class="h5 fw-bold mb-0"><i class="bi bi-plus-square"></i> Add MCQ</h2>
+                            <span class="badge-soft" th:classappend="${limitReached ? ' danger' : ' success'}">
+                                <span th:text="${#lists.size(questions)} + '/' + ${exam.totalQuestions}">0/0</span>
+                            </span>
+                        </div>
+                        <p class="muted-copy small" th:if="${limitReached}">
+                            <i class="bi bi-check-circle"></i> You have reached the question limit for this exam.
+                        </p>
+                        <p class="muted-copy small" th:if="${!limitReached}">
+                            Add one or more questions. You can add
+                            <strong th:text="${exam.totalQuestions - #lists.size(questions)}">N</strong>
+                            more.
+                        </p>
+                        <form id="bulkQuestionForm" method="post" th:action="@{'/examiner/exam/' + ${exam.id} + '/questions'}">
+                            <div id="questionRows">
+                                <div class="bulk-question-row mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <label class="form-label mb-0">Question 1</label>
+                                        <button class="btn-line remove-question-row d-none" type="button" title="Remove question" th:disabled="${limitReached}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                    <textarea class="form-control mb-3" rows="3" name="questionText" placeholder="Enter question text" required th:disabled="${limitReached}"></textarea>
+                                    <div class="row g-2">
+                                        <div class="col-md-6"><input class="form-control" name="optionA" placeholder="Option A" required th:disabled="${limitReached}"></div>
+                                        <div class="col-md-6"><input class="form-control" name="optionB" placeholder="Option B" required th:disabled="${limitReached}"></div>
+                                        <div class="col-md-6"><input class="form-control" name="optionC" placeholder="Option C" required th:disabled="${limitReached}"></div>
+                                        <div class="col-md-6"><input class="form-control" name="optionD" placeholder="Option D" required th:disabled="${limitReached}"></div>
+                                    </div>
+                                    <label class="form-label mt-3">Correct option</label>
+                                    <select class="form-select" name="correctOption" th:disabled="${limitReached}">
+                                        <option value="A">A</option>
+                                        <option value="B">B</option>
+                                        <option value="C">C</option>
+                                        <option value="D">D</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2 mb-3">
+                                <button id="addQuestionRow" class="btn-soft flex-fill" type="button" th:disabled="${limitReached}">
+                                    <i class="bi bi-plus-square"></i> Add another
+                                </button>
+                                <button class="btn-brand flex-fill" type="submit" th:disabled="${limitReached}">
+                                    <i class="bi bi-plus-circle"></i> Save questions
+                                </button>
+                            </div>
+                        </form>
+
+                        <hr>
+
+                        <form method="post" th:action="@{'/examiner/exam/' + ${exam.id} + '/publish'}">
+                            <button class="btn-soft w-100" type="submit" th:disabled="${exam.published}">
+                                <i class="bi bi-broadcast"></i>
+                                <span th:text="${exam.published ? 'Already published' : 'Publish exam'}">Publish</span>
+                            </button>
+                        </form>
+                    </section>
+                </div>
+
+                <div class="col-lg-7">
+                    <section class="content-panel mb-4 animate-fade-up">
+                        <h2 class="h5 fw-bold mb-3"><i class="bi bi-list-ol"></i> Questions</h2>
+                        <div class="answer-row" th:each="q, st : ${questions}">
+                            <strong><span th:text="${st.count} + '. '">1.</span><span th:text="${q.questionText}">Question</span></strong>
+                            <div class="opts">
+                                <span class="opt" th:classappend="${q.correctOption == 'A'} ? ' correct-opt' : ''">A. <span th:text="${q.optionA}">A</span></span>
+                                <span class="opt" th:classappend="${q.correctOption == 'B'} ? ' correct-opt' : ''">B. <span th:text="${q.optionB}">B</span></span>
+                                <span class="opt" th:classappend="${q.correctOption == 'C'} ? ' correct-opt' : ''">C. <span th:text="${q.optionC}">C</span></span>
+                                <span class="opt" th:classappend="${q.correctOption == 'D'} ? ' correct-opt' : ''">D. <span th:text="${q.optionD}">D</span></span>
+                            </div>
+                        </div>
+                        <p class="muted-copy mb-0" th:if="${#lists.isEmpty(questions)}">
+                            <i class="bi bi-inbox"></i> No questions added yet.
+                        </p>
+                    </section>
+
+                    <section class="content-panel animate-fade-up delay-1">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="h5 fw-bold mb-0"><i class="bi bi-people"></i> Attempts</h2>
+                            <a class="btn-line" th:href="@{'/examiner/exam/' + ${exam.id} + '/analytics'}"><i class="bi bi-graph-up"></i> Full report</a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead><tr><th>Student</th><th>Email</th><th>Score</th></tr></thead>
+                                <tbody>
+                                <tr th:each="a : ${attempts}">
+                                    <td th:text="${a.student.fullName}">Student</td>
+                                    <td th:text="${a.student.email}">Email</td>
+                                    <td><strong th:text="${a.score} + '/' + ${a.totalQuestions}">0/0</strong></td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(attempts)}">
+                                    <td colspan="3" class="text-center muted-copy py-4">Student submissions will appear here.</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/app.js}"></script>
+<script th:inline="javascript">
+    const questionRows = document.getElementById('questionRows');
+    const addQuestionRow = document.getElementById('addQuestionRow');
+    const maxQuestionRows = /*[[${exam.totalQuestions - #lists.size(questions)}]]*/ 1;
+
+    function refreshQuestionRows() {
+        const rows = questionRows.querySelectorAll('.bulk-question-row');
+        rows.forEach((row, index) => {
+            row.querySelector('.form-label').textContent = `Question ${index + 1}`;
+            row.querySelector('.remove-question-row').classList.toggle('d-none', rows.length === 1);
+        });
+        addQuestionRow.disabled = rows.length >= maxQuestionRows;
+    }
+
+    if (questionRows && addQuestionRow) {
+        addQuestionRow.addEventListener('click', () => {
+            const rows = questionRows.querySelectorAll('.bulk-question-row');
+            if (rows.length >= maxQuestionRows) {
+                return;
+            }
+            const nextRow = rows[0].cloneNode(true);
+            nextRow.querySelectorAll('textarea, input').forEach(field => field.value = '');
+            nextRow.querySelector('select').value = 'A';
+            questionRows.appendChild(nextRow);
+            refreshQuestionRows();
+        });
+
+        questionRows.addEventListener('click', (event) => {
+            const button = event.target.closest('.remove-question-row');
+            if (!button) {
+                return;
+            }
+            const rows = questionRows.querySelectorAll('.bulk-question-row');
+            if (rows.length > 1) {
+                button.closest('.bulk-question-row').remove();
+                refreshQuestionRows();
+            }
+        });
+
+        refreshQuestionRows();
+    }
+    const shareModal = document.querySelector('.publish-share-modal');
+    if (shareModal) {
+        const rawLink = shareModal.dataset.link || '';
+        const absoluteLink = rawLink.startsWith('http') ? rawLink : `${window.location.origin}${rawLink}`;
+        const title = shareModal.dataset.title || 'IntelliExam';
+        const password = shareModal.dataset.password || '';
+        const linkInput = document.getElementById('publishedExamLink');
+        if (linkInput) {
+            linkInput.value = absoluteLink;
+        }
+        const shareText = `${title}\nExam link: ${absoluteLink}\nPassword: ${password}\nPlease keep your ID details ready and join in full-screen mode.`;
+        document.getElementById('shareWhatsapp')?.setAttribute('href', `https://wa.me/?text=${encodeURIComponent(shareText)}`);
+        document.getElementById('shareTelegram')?.setAttribute('href', `https://t.me/share/url?url=${encodeURIComponent(absoluteLink)}&text=${encodeURIComponent(`${title} - Password: ${password}`)}`);
+        document.getElementById('shareMail')?.setAttribute('href', `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(shareText)}`);
+    }
+
+    document.querySelectorAll('[data-copy-target]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const target = document.getElementById(button.dataset.copyTarget);
+            if (target) {
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(target.value);
+                } else {
+                    target.select();
+                    document.execCommand('copy');
+                }
+                button.classList.add('copied');
+                setTimeout(() => button.classList.remove('copied'), 900);
+            }
+        });
+    });
+
+    document.querySelector('.publish-close')?.addEventListener('click', () => {
+        document.querySelector('.publish-share-modal')?.remove();
+    });
+</script>
+</body>
+</html>

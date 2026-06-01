@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Take Exam | IntelliExam</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments :: head-assets}"></th:block>
+</head>
+<body class="exam-shell">
+<div id="secureStartOverlay" class="secure-start-overlay">
+    <div class="secure-start-card animate-pop">
+        <span class="badge-soft"><i class="bi bi-shield-lock"></i> Secure exam mode</span>
+        <h1 class="h3 fw-bold mt-3" th:text="${exam.title}">Exam</h1>
+        <p class="muted-copy" th:text="${exam.strictFullscreen ? 'Click start to enter full screen. The timer begins only after full screen is active.' : 'Click start to begin. Full screen will be requested.'}">
+            Click start to enter full screen.
+        </p>
+        <div id="fullscreenError" class="alert alert-danger d-none">
+            Full screen was blocked. Click the button again and allow full screen in your browser.
+        </div>
+        <div class="secure-start-grid">
+            <span><i class="bi bi-arrows-fullscreen"></i> Full screen required</span>
+            <span><i class="bi bi-fullscreen-exit"></i> Esc counts as violation</span>
+            <span><i class="bi bi-stopwatch"></i> Timed exam</span>
+            <span><i class="bi bi-shield-check"></i> Auto-submit enabled</span>
+        </div>
+        <button id="enterFullScreenBtn" class="btn-brand w-100 mt-4" type="button">
+            <i class="bi bi-play-circle"></i> Enter Full Screen & Start
+        </button>
+    </div>
+</div>
+<header class="exam-topbar">
+    <div class="container-fluid px-4 py-3 d-flex justify-content-between align-items-center gap-3 flex-wrap">
+        <div class="brand-lockup">
+            <span class="brand-mark"><i class="bi bi-mortarboard-fill"></i></span>
+            <span>
+                <span class="brand-name" th:text="${exam.title}">Exam</span>
+                <span class="brand-caption"><i class="bi bi-shield-lock"></i> Secure exam room</span>
+            </span>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span class="badge-soft"><i class="bi bi-stopwatch"></i> Timer: <span id="timer" class="ms-1">--:--</span></span>
+            <button class="btn-danger-soft" type="submit" form="examForm"><i class="bi bi-send"></i> Submit exam</button>
+        </div>
+    </div>
+</header>
+
+<main class="exam-room">
+    <div class="exam-layout">
+        <section class="exam-question-area">
+            <form id="examForm" method="post" th:action="@{'/student/exam/' + ${exam.id} + '/submit'}">
+                <div class="question-card animate-fade-up" th:each="q, st : ${questions}" th:style="'animation-delay:' + ${st.index * 0.03} + 's'">
+                    <div class="question-heading">
+                        <span class="question-number" th:text="${st.count}">1</span>
+                        <div>
+                            <span class="badge-soft" th:text="'Question ' + ${st.count}">Question</span>
+                            <h2 class="h5 fw-bold mb-0 mt-2" th:text="${q.questionText}">Question</h2>
+                        </div>
+                    </div>
+
+                    <label class="option-row">
+                        <input class="form-check-input" type="radio" th:name="${'q_' + q.id}" th:id="${'q_' + q.id + '_A'}" value="A">
+                        <span class="option-key">A</span>
+                        <span th:text="${q.optionA}">Option A</span>
+                    </label>
+                    <label class="option-row">
+                        <input class="form-check-input" type="radio" th:name="${'q_' + q.id}" th:id="${'q_' + q.id + '_B'}" value="B">
+                        <span class="option-key">B</span>
+                        <span th:text="${q.optionB}">Option B</span>
+                    </label>
+                    <label class="option-row">
+                        <input class="form-check-input" type="radio" th:name="${'q_' + q.id}" th:id="${'q_' + q.id + '_C'}" value="C">
+                        <span class="option-key">C</span>
+                        <span th:text="${q.optionC}">Option C</span>
+                    </label>
+                    <label class="option-row">
+                        <input class="form-check-input" type="radio" th:name="${'q_' + q.id}" th:id="${'q_' + q.id + '_D'}" value="D">
+                        <span class="option-key">D</span>
+                        <span th:text="${q.optionD}">Option D</span>
+                    </label>
+                </div>
+                <div class="exam-submit-strip">
+                    <button class="btn-danger-soft" type="submit"><i class="bi bi-send-check"></i> Submit exam</button>
+                </div>
+            </form>
+        </section>
+        <aside class="exam-sidebar">
+            <div class="content-panel exam-side">
+                <span class="badge-soft"><i class="bi bi-activity"></i> Progress</span>
+                <h2 class="h5 fw-bold mt-3">Exam Panel</h2>
+                <p class="muted-copy" id="summary">Attended: 0 | Skipped: 0 | Not Visited: 0</p>
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item px-0 d-flex justify-content-between"><span><i class="bi bi-arrows-fullscreen"></i> Full-screen</span><strong id="fullscreenStatus">Waiting</strong></div>
+                    <div class="list-group-item px-0 d-flex justify-content-between"><span><i class="bi bi-exclamation-octagon"></i> Tab warnings</span><strong id="warningCount">0/2</strong></div>
+                    <div class="list-group-item px-0 d-flex justify-content-between"><span><i class="bi bi-shield-check"></i> Auto-submit</span><strong>Enabled</strong></div>
+                </div>
+                <div class="progress-legend">
+                    <span><i class="legend-dot attended"></i> Attended</span>
+                    <span><i class="legend-dot skipped"></i> Skipped</span>
+                    <span><i class="legend-dot waiting"></i> Waiting</span>
+                </div>
+            </div>
+        </aside>
+    </div>
+</main>
+<script th:src="@{/js/exam.js}"></script>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', () => setupExam(/*[[${exam.durationMinutes}]]*/ 0, /*[[${exam.strictFullscreen}]]*/ true));
+</script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>About IntelliExam</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments :: head-assets}"></th:block>
+</head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments :: navbar}"></div>
+    <main class="page-section">
+        <div class="container">
+            <div class="section-title animate-fade-up">
+                <span class="badge-soft"><i class="bi bi-info-circle"></i> About the platform</span>
+                <h2 class="mt-3">IntelliExam makes online assessments easier to run and easier to take.</h2>
+                <p class="muted-copy">The platform combines examiner tools, student dashboards, timed exams, rule acknowledgement, auto-scoring, visual analytics, and downloadable Excel reports in one focused workflow.</p>
+            </div>
+            <div class="feature-grid">
+                <article class="feature-card animate-pop">
+                    <div class="feature-icon"><i class="bi bi-clipboard-check"></i></div>
+                    <h3>For examiners</h3>
+                    <p class="muted-copy mb-0">Create exams, set question limits, schedule them, secure them with passwords, add MCQs, publish, and export full Excel reports.</p>
+                </article>
+                <article class="feature-card animate-pop delay-1">
+                    <div class="feature-icon"><i class="bi bi-mortarboard"></i></div>
+                    <h3>For students</h3>
+                    <p class="muted-copy mb-0">Find ongoing and upcoming exams, read instructions, enter securely, answer in a clean focus room, and view visual results.</p>
+                </article>
+                <article class="feature-card animate-pop delay-2">
+                    <div class="feature-icon"><i class="bi bi-building"></i></div>
+                    <h3>For institutions</h3>
+                    <p class="muted-copy mb-0">Use a clear exam process that works for classrooms, practice tests, skill checks, recruitment, and training.</p>
+                </article>
+            </div>
+        </div>
+    </main>
+    <div th:replace="~{fragments :: footer}"></div>
+</div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

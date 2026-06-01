@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>IntelliExam | Secure Online Exam Platform</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments :: head-assets}"></th:block>
+</head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments :: navbar}"></div>
+
+    <main>
+        <section class="hero">
+            <div class="container hero-content">
+                <div class="hero-grid">
+                    <div class="animate-fade-up">
+                        <span class="eyebrow"><i class="bi bi-shield-check"></i> Secure digital exams</span>
+                        <h1>IntelliExam</h1>
+                        <p class="hero-lead">A complete exam platform for students, examiners, colleges, and training teams. Build MCQ assessments, protect access with exam passwords, guide students through rules, auto-score submissions, and export rich reports.</p>
+                        <div class="hero-actions">
+                            <a class="btn-brand" th:href="@{/register}"><i class="bi bi-rocket-takeoff"></i> Start free</a>
+                            <a class="btn-line" th:href="@{/login}"><i class="bi bi-box-arrow-in-right"></i> Login</a>
+                            <a class="btn-line" th:href="@{/contact}"><i class="bi bi-envelope"></i> Contact team</a>
+                        </div>
+                    </div>
+
+                    <div class="exam-preview animate-fade-up delay-2">
+                        <div class="preview-top">
+                            <div>
+                                <span class="badge-soft success"><i class="bi bi-broadcast"></i> Live readiness</span>
+                                <h2 class="h4 mt-3 mb-1">Data Structures Mock Test</h2>
+                                <p class="muted-copy mb-0">Password-protected exam window with timer, rules, monitoring warnings, visual results, and Excel report.</p>
+                            </div>
+                            <span class="status-dot" aria-label="Live"></span>
+                        </div>
+                        <div class="metric-grid">
+                            <div class="metric"><strong>60</strong><span>Minutes</span></div>
+                            <div class="metric"><strong>40</strong><span>Questions</span></div>
+                            <div class="metric"><strong>3</strong><span>Warnings</span></div>
+                        </div>
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item px-0 d-flex justify-content-between"><span><i class="bi bi-person-check"></i> Student verification</span><strong>Ready</strong></div>
+                            <div class="list-group-item px-0 d-flex justify-content-between"><span><i class="bi bi-collection"></i> Question bank</span><strong>Loaded</strong></div>
+                            <div class="list-group-item px-0 d-flex justify-content-between"><span><i class="bi bi-file-earmark-excel"></i> Excel reporting</span><strong>Enabled</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="page-section">
+            <div class="container">
+                <div class="section-title animate-fade-up">
+                    <span class="badge-soft"><i class="bi bi-tools"></i> Built for exam operations</span>
+                    <h2 class="mt-3">Everything a modern exam portal needs.</h2>
+                    <p class="muted-copy">The design follows mature online exam products: clean exam setup, strong instructions, timed assessment mode, dashboards, attempts, visual analytics, and downloadable reports.</p>
+                </div>
+                <div class="feature-grid">
+                    <article class="feature-card animate-pop">
+                        <div class="feature-icon"><i class="bi bi-clipboard-check"></i></div>
+                        <h3>Examiner workspace</h3>
+                        <p class="muted-copy mb-0">Create assessments, set question limits, manage MCQs, publish when ready, review submissions, and publish results.</p>
+                    </article>
+                    <article class="feature-card animate-pop delay-1">
+                        <div class="feature-icon"><i class="bi bi-mortarboard"></i></div>
+                        <h3>Student dashboard</h3>
+                        <p class="muted-copy mb-0">View ongoing &amp; upcoming tests, update your profile, take exams in a focus room, and explore visual result analysis.</p>
+                    </article>
+                    <article class="feature-card animate-pop delay-2">
+                        <div class="feature-icon"><i class="bi bi-bar-chart-line"></i></div>
+                        <h3>Visual analytics</h3>
+                        <p class="muted-copy mb-0">Per-student doughnut charts, exam-wide score bars, pass/fail breakdown, and one-click Excel/CSV download.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="page-section band">
+            <div class="container">
+                <div class="row g-4 align-items-center">
+                    <div class="col-lg-7">
+                        <h2 class="fw-bold display-6">For colleges, coaching centers, recruiters, and internal training teams.</h2>
+                        <p class="muted-copy mb-0">IntelliExam keeps the experience simple for students while giving examiners the controls they need to run reliable assessments.</p>
+                    </div>
+                    <div class="col-lg-5">
+                        <div class="metric-grid">
+                            <div class="metric"><strong>24/7</strong><span>Portal access</span></div>
+                            <div class="metric"><strong>XLSX</strong><span>Reports</span></div>
+                            <div class="metric"><strong>Auto</strong><span>Scoring</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div th:replace="~{fragments :: footer}"></div>
+</div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

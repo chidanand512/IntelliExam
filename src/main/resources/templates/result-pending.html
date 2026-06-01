@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Result Pending | IntelliExam</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments :: head-assets}"></th:block>
+</head>
+<body>
+<div class="app-shell-app">
+    <aside th:replace="~{fragments :: sidenav('STUDENT', 'results')}"></aside>
+    <div class="app-main">
+        <header th:replace="~{fragments :: topbar('Result pending','Waiting for examiner to publish.')}"></header>
+
+        <main class="app-content animate-fade-up">
+            <section class="content-panel text-center animate-pop">
+                <i class="bi bi-hourglass-split" style="font-size:3rem;color:var(--accent)"></i>
+                <h2 class="h3 fw-bold mt-3">Result not published yet</h2>
+                <p class="muted-copy" th:text="'Your attempt for ' + ${attempt.exam.title} + ' is recorded. The examiner will publish the result soon.'">Waiting...</p>
+                <a class="btn-brand" th:href="@{/student/results}"><i class="bi bi-arrow-left"></i> Back to results</a>
+            </section>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Exam Analytics | IntelliExam</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments :: head-assets}"></th:block>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app-shell-app">
+    <aside th:replace="~{fragments :: sidenav('EXAMINER', 'dashboard')}"></aside>
+    <div class="app-main">
+        <header th:replace="~{fragments :: topbar('Analytics &amp; final report','Visual breakdown plus Excel export.')}"></header>
+
+        <main class="app-content animate-fade-up">
+            <section class="greeting-banner">
+                <div>
+                    <span class="badge-soft" style="background: rgba(255,255,255,.18); color: #fff;"
+                          th:text="${exam.resultsPublished ? 'Results published to students' : 'Results hidden from students'}">Status</span>
+                    <h2 class="mt-2" th:text="${exam.title}">Exam</h2>
+                    <p>Visual analysis of all submissions. Download full report or publish results so students can view their analysis.</p>
+                </div>
+                <div class="quick-actions">
+                    <a class="btn-line" th:href="@{'/examiner/exam/' + ${exam.id} + '/report.xlsx'(search=${search},college=${college},branch=${branch},academicYear=${academicYear},studentType=${studentType},sort=${sort})}"><i class="bi bi-file-earmark-excel"></i> Excel</a>
+                    <a class="btn-line" th:href="@{'/examiner/exam/' + ${exam.id} + '/report.csv'(search=${search},college=${college},branch=${branch},academicYear=${academicYear},studentType=${studentType},sort=${sort})}"><i class="bi bi-filetype-csv"></i> CSV</a>
+                    <form method="post" th:action="@{'/examiner/exam/' + ${exam.id} + '/publish-results'}" class="d-inline">
+                        <button class="btn-brand" type="submit">
+                            <i class="bi bi-megaphone"></i>
+                            <span th:text="${exam.resultsPublished ? 'Unpublish results' : 'Publish results'}">Publish results</span>
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <div class="stat-grid">
+                <div class="stat-card animate-pop"><strong th:text="${submitted}">0</strong><span>Submissions</span><div class="stat-ico"><i class="bi bi-inbox"></i></div></div>
+                <div class="stat-card animate-pop delay-1"><strong th:text="${avgScore}">0</strong><span>Average score</span><div class="stat-ico"><i class="bi bi-graph-up"></i></div></div>
+                <div class="stat-card animate-pop delay-2"><strong th:text="${topScore} + '/' + ${totalQuestions}">0/0</strong><span>Top score</span><div class="stat-ico"><i class="bi bi-trophy"></i></div></div>
+                <div class="stat-card animate-pop delay-3"><strong th:text="${lowScore} + '/' + ${totalQuestions}">0/0</strong><span>Lowest score</span><div class="stat-ico"><i class="bi bi-bar-chart"></i></div></div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-7">
+                    <section class="content-panel animate-fade-up">
+                        <h2 class="h5 fw-bold mb-3"><i class="bi bi-bar-chart"></i> Score distribution</h2>
+                        <canvas id="scoreBarChart" height="180"></canvas>
+                    </section>
+                </div>
+                <div class="col-lg-5">
+                    <section class="content-panel animate-fade-up delay-1">
+                        <h2 class="h5 fw-bold mb-3"><i class="bi bi-pie-chart"></i> Pass / Fail</h2>
+                        <canvas id="passFailChart" height="180"></canvas>
+                    </section>
+                </div>
+            </div>
+
+            <section class="content-panel mt-4 animate-fade-up">
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <h2 class="h5 fw-bold mb-0"><i class="bi bi-people"></i> Final report - All students</h2>
+                    <div class="d-flex gap-2">
+                        <a class="btn-brand" th:href="@{'/examiner/exam/' + ${exam.id} + '/report.xlsx'(search=${search},college=${college},branch=${branch},academicYear=${academicYear},studentType=${studentType},sort=${sort})}"><i class="bi bi-download"></i> Download Excel</a>
+                        <a class="btn-line" th:href="@{'/examiner/exam/' + ${exam.id} + '/report.csv'(search=${search},college=${college},branch=${branch},academicYear=${academicYear},studentType=${studentType},sort=${sort})}"><i class="bi bi-download"></i> CSV</a>
+                    </div>
+                </div>
+                <form class="filter-panel mb-3" method="get" th:action="@{'/examiner/exam/' + ${exam.id} + '/analytics'}">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label" for="search"><i class="bi bi-search"></i> Search</label>
+                            <input id="search" class="form-control" name="search" th:value="${search}" placeholder="Name, email, register no.">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label" for="college">College</label>
+                            <input id="college" class="form-control" name="college" th:value="${college}" placeholder="College">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label" for="branch">Branch</label>
+                            <input id="branch" class="form-control" name="branch" th:value="${branch}" placeholder="Branch">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label" for="academicYear">Year</label>
+                            <select id="academicYear" class="form-select" name="academicYear">
+                                <option value="">All years</option>
+                                <option value="1st Year" th:selected="${academicYear == '1st Year'}">1st Year</option>
+                                <option value="2nd Year" th:selected="${academicYear == '2nd Year'}">2nd Year</option>
+                                <option value="3rd Year" th:selected="${academicYear == '3rd Year'}">3rd Year</option>
+                                <option value="4th Year" th:selected="${academicYear == '4th Year'}">4th Year</option>
+                                <option value="Other" th:selected="${academicYear == 'Other'}">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label" for="studentType">Student type</label>
+                            <select id="studentType" class="form-select" name="studentType">
+                                <option value="">All students</option>
+                                <option value="private" th:selected="${studentType == 'private'}">Private / inside</option>
+                                <option value="public" th:selected="${studentType == 'public'}">Public / outside</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label" for="sort">Sort</label>
+                            <select id="sort" class="form-select" name="sort">
+                                <option value="scoreDesc" th:selected="${sort == 'scoreDesc'}">Score high to low</option>
+                                <option value="scoreAsc" th:selected="${sort == 'scoreAsc'}">Score low to high</option>
+                                <option value="nameAsc" th:selected="${sort == 'nameAsc'}">Name A-Z</option>
+                                <option value="nameDesc" th:selected="${sort == 'nameDesc'}">Name Z-A</option>
+                                <option value="dateDesc" th:selected="${sort == 'dateDesc'}">Newest first</option>
+                                <option value="dateAsc" th:selected="${sort == 'dateAsc'}">Oldest first</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1 d-grid">
+                            <button class="btn-brand" type="submit" title="Apply filters"><i class="bi bi-funnel"></i></button>
+                        </div>
+                    </div>
+                </form>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                        <tr><th>#</th><th>Student</th><th>Email</th><th>College</th><th>Branch</th><th>Year</th><th>Register no.</th><th>Type</th><th>Score</th><th>%</th><th>Submitted</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="a, st : ${attempts}">
+                            <td th:text="${st.count}">1</td>
+                            <td>
+                                <strong th:text="${a.student.fullName}">Name</strong>
+                                <div class="muted-copy small" th:text="${a.student.phone}">phone</div>
+                            </td>
+                            <td th:text="${a.student.email}">email</td>
+                            <td th:text="${a.student.college}">college</td>
+                            <td th:text="${a.student.branch ?: '-'}">branch</td>
+                            <td th:text="${a.student.academicYear ?: '-'}">year</td>
+                            <td th:text="${a.student.registerNumber ?: '-'}">register</td>
+                            <td><span class="badge-soft" th:classappend="${a.student.publicStudent ? ' info' : ' success'}" th:text="${a.student.publicStudent ? 'Public' : 'Private'}">Type</span></td>
+                            <td><strong th:text="${a.score} + '/' + ${a.totalQuestions}">0/0</strong></td>
+                            <td th:with="pct=${a.totalQuestions != null and a.totalQuestions > 0 ? (a.score * 100 / a.totalQuestions) : 0}">
+                                <span class="badge-soft" th:classappend="${pct >= 60 ? ' success' : (pct >= 40 ? ' warning' : ' danger')}" th:text="${pct} + '%'">0%</span>
+                            </td>
+                            <td th:text="${#temporals.format(a.submittedAt, 'yyyy-MM-dd HH:mm')}">date</td>
+                            <td>
+                                <a class="btn-line" th:href="@{'/examiner/exam/' + ${exam.id} + '/attempt/' + ${a.id}}" title="View student analysis">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(attempts)}">
+                            <td colspan="12" class="text-center muted-copy py-4">No submissions yet.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/app.js}"></script>
+<script th:inline="javascript">
+    const labels = /*[[${chartLabels}]]*/ [];
+    const scores = /*[[${chartScores}]]*/ [];
+    const totalQ = /*[[${totalQuestions}]]*/ 0;
+
+    const passing = scores.filter(s => totalQ > 0 && (s / totalQ) >= 0.4).length;
+    const failing = scores.length - passing;
+
+    const barCtx = document.getElementById('scoreBarChart');
+    if (barCtx) {
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Score',
+                    data: scores,
+                    backgroundColor: scores.map(s => totalQ > 0 && (s / totalQ) >= 0.6 ? '#16a34a' : (s / totalQ) >= 0.4 ? '#f59e0b' : '#dc2626'),
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true, max: Math.max(totalQ, 1) }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+    const pieCtx = document.getElementById('passFailChart');
+    if (pieCtx) {
+        new Chart(pieCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Pass (≥ 40%)', 'Fail'],
+                datasets: [{
+                    data: [passing, failing],
+                    backgroundColor: ['#16a34a', '#dc2626'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                cutout: '62%',
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+    }
+</script>
+</body>
+</html>

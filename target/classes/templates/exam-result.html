@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Submitted | IntelliExam</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments :: head-assets}"></th:block>
+</head>
+<body>
+<div class="app-shell-app">
+    <aside th:replace="~{fragments :: sidenav('STUDENT', 'results')}"></aside>
+    <div class="app-main">
+        <header th:replace="~{fragments :: topbar('Exam submitted','Your answers are recorded.')}"></header>
+
+        <main class="app-content animate-fade-up">
+            <section class="content-panel text-center animate-pop">
+                <i class="bi bi-check2-circle" style="font-size:3.4rem;color:var(--success)"></i>
+                <h1 class="display-6 fw-bold mt-2">Exam Submitted</h1>
+                <p class="muted-copy">Thank you for completing the test. Your answers were saved successfully.</p>
+
+                <div class="metric-grid my-4" style="max-width:540px;margin-left:auto;margin-right:auto">
+                    <div class="metric"><strong th:text="${attempt.exam.title}">Exam</strong><span>Assessment</span></div>
+                    <div class="metric"><strong th:text="${attempt.totalQuestions}">0</strong><span>Total Qs</span></div>
+                    <div class="metric"><strong th:text="${attempt.exam.resultsPublished ? attempt.score : '—'}">0</strong><span>Score</span></div>
+                </div>
+
+                <div th:if="${attempt.exam.resultsPublished}">
+                    <p class="muted-copy">Result is published. View the detailed analysis below.</p>
+                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                        <a class="btn-brand" th:href="@{'/student/result/' + ${attempt.id}}"><i class="bi bi-graph-up"></i> View analysis</a>
+                        <a class="btn-line" th:href="@{/student/dashboard}"><i class="bi bi-house"></i> Dashboard</a>
+                    </div>
+                </div>
+                <div th:if="${!attempt.exam.resultsPublished}">
+                    <p class="muted-copy">Your result will be visible once the examiner publishes it.</p>
+                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                        <a class="btn-line" th:href="@{'/student/attempt/' + ${attempt.id} + '/download'}"><i class="bi bi-download"></i> Acknowledgement</a>
+                        <a class="btn-brand" th:href="@{/student/dashboard}"><i class="bi bi-house"></i> Dashboard</a>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>
