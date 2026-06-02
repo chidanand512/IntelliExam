@@ -14,15 +14,10 @@ The system follows the MVC (Model-View-Controller) architecture and implements a
 
 - Secure Examiner Registration & Login
 - Create and Manage Exams
-- Configure Exam Duration
-- Enable/Disable Negative Marking
-- Configure Negative Mark Value
 - Enable Strict Fullscreen Mode
 - Publish/Unpublish Exams
 - Generate Public Exam Links
-- Add Questions Manually
 - Bulk Question Upload Support
-- View Student Attempts
 - Publish Results
 - Download Results as Excel Reports
 - View Exam Analytics Dashboard
@@ -34,9 +29,6 @@ The system follows the MVC (Model-View-Controller) architecture and implements a
 - Secure Student Registration & Login
 - View Upcoming Exams
 - View Ongoing Exams
-- Attempt Available Exams
-- Fullscreen Examination Experience
-- Auto Evaluation
 - View Published Results
 - Track Exam History
 
@@ -288,7 +280,6 @@ The examiner can:
 - BCrypt Password Encryption
 - Session-Based Authentication
 - Exam Attempt Validation
-- Duplicate Attempt Prevention
 - Secure Public Exam Tokens
 - Role-Based User Management
 
