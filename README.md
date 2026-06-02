@@ -2,9 +2,7 @@ IntelliExam – Smart Online Examination Platform
 
 📌 Overview
 
-IntelliExam is a comprehensive web-based Online Examination Management System developed using Spring Boot, Thymeleaf, MySQL, JPA/Hibernate, HTML, CSS, and JavaScript.
-
-The platform enables educational institutions, trainers, and organizations to conduct secure online examinations with features such as negative marking, fullscreen examination mode, public exam sharing, result publishing, performance analytics, and Excel report generation.
+IntelliExam is a comprehensive web-based Online Examination Management System developed using Spring Boot, Thymeleaf, MySQL, JPA/Hibernate, HTML, CSS, and JavaScript.  
 
 The system follows the MVC (Model-View-Controller) architecture and implements a layered design consisting of Controllers, Services, Repositories, and Entities to ensure scalability, maintainability, and clean code practices.
 
